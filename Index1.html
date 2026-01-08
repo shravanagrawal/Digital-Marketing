@@ -1,0 +1,1236 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>LocalBoost — AI-Assisted Digital Marketing for MSMEs</title>
+<meta name="description" content="LocalBoost: Plan, execute, and analyze digital marketing campaigns easily and affordably. Developed by Shravan Agrawal." />
+<meta name="theme-color" content="#0ea5e9" />
+
+<style>
+  :root{
+    --bg:#0b1220;
+    --panel:#111827;
+    --muted:#6b7280;
+    --text:#e5e7eb;
+    --primary:#0ea5e9;
+    --primary-2:#22d3ee;
+    --accent:#a78bfa;
+    --success:#10b981;
+    --warning:#f59e0b;
+    --danger:#ef4444;
+    --border:#1f2937;
+  }
+  *{box-sizing:border-box}
+  html,body{height:100%}
+  body{
+    margin:0;
+    font-family:Inter,system-ui,Segoe UI,Roboto,Helvetica,Arial,sans-serif;
+    background: radial-gradient(1200px 600px at 80% -100%, rgba(34,211,238,0.15), transparent 60%), 
+                radial-gradient(800px 400px at -20% -60%, rgba(167,139,250,0.12), transparent 60%),
+                var(--bg);
+    color:var(--text);
+  }
+  a{color:var(--primary)}
+  .app{
+    display:grid;
+    grid-template-columns: 280px 1fr;
+    grid-template-rows: 64px 1fr;
+    grid-template-areas:
+      "topbar topbar"
+      "sidebar main";
+    min-height:100vh;
+  }
+  /* Topbar */
+  .topbar{
+    grid-area:topbar;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    padding:0 16px;
+    border-bottom:1px solid var(--border);
+    backdrop-filter:saturate(140%) blur(10px);
+    background:linear-gradient(to right, #0b1220cc, #0b1220aa);
+    position:sticky; top:0; z-index:50;
+  }
+  .brand{
+    display:flex; align-items:center; gap:12px;
+  }
+  .brand-logo{
+    width:36px;height:36px;border-radius:10px;
+    background:conic-gradient(from 210deg,var(--primary),var(--accent),var(--primary-2));
+    box-shadow:0 0 0 2px #0b1220, 0 8px 24px rgba(14,165,233,0.35);
+  }
+  .brand-title{font-weight:700;letter-spacing:0.2px}
+  .byline{color:var(--muted);font-size:12px}
+  .top-actions{display:flex;gap:8px}
+  .btn{
+    display:inline-flex; align-items:center; gap:8px;
+    border:1px solid var(--border);
+    background:linear-gradient(180deg,#111827 0%, #0f172a 100%);
+    color:var(--text); padding:8px 12px; border-radius:10px;
+    font-weight:600; cursor:pointer; transition:transform .05s ease, box-shadow .2s ease, border-color .2s ease;
+  }
+  .btn:hover{border-color:#334155; box-shadow:0 6px 18px rgba(14,165,233,0.15)}
+  .btn:active{transform:translateY(1px)}
+  .btn.primary{background:linear-gradient(180deg,#0ea5e9,#0284c7); border-color:#0284c7}
+  .btn.success{background:linear-gradient(180deg,#10b981,#059669); border-color:#059669}
+  .btn.warn{background:linear-gradient(180deg,#f59e0b,#b45309); border-color:#b45309}
+  .chip{padding:4px 8px; border:1px dashed #334155; border-radius:8px; color:#93c5fd; background:#0b122066}
+  /* Sidebar */
+  .sidebar{
+    grid-area:sidebar; border-right:1px solid var(--border);
+    background:linear-gradient(180deg, #0b1220, #0c1325 50%, #0b1220);
+    padding:12px; position:sticky; top:64px; height:calc(100vh - 64px); overflow:auto;
+  }
+  .nav-group{margin-bottom:16px}
+  .nav-title{font-size:12px; color:var(--muted); margin:8px 8px}
+  .nav-item{
+    display:flex; align-items:center; gap:10px;
+    padding:10px 12px; border-radius:10px; cursor:pointer;
+    color:#cbd5e1;
+  }
+  .nav-item:hover{background:#0f172a}
+  .nav-item.active{background:#0ea5e920; border:1px solid #0284c7}
+  .nav-item svg{width:18px;height:18px;opacity:.9}
+  /* Main */
+  .main{grid-area:main; padding:16px; overflow:auto}
+  .section{display:none; animation:fade .25s ease}
+  .section.active{display:block}
+  @keyframes fade{from{opacity:.0; transform:translateY(4px)} to{opacity:1; transform:none}}
+  .panel{
+    background:linear-gradient(180deg,#0f172a,#0b1220);
+    border:1px solid var(--border); border-radius:14px;
+    padding:16px; margin-bottom:16px;
+  }
+  .panel-header{display:flex; align-items:center; justify-content:space-between; margin-bottom:12px}
+  .panel-title{font-weight:700}
+  .grid{
+    display:grid; gap:12px;
+  }
+  .grid.cols-2{grid-template-columns:1fr 1fr}
+  .grid.cols-3{grid-template-columns:repeat(3,1fr)}
+  .grid.cols-4{grid-template-columns:repeat(4,1fr)}
+  .field{display:flex; flex-direction:column; gap:6px}
+  .label{font-size:12px; color:var(--muted)}
+  input[type="text"], input[type="number"], input[type="date"], textarea, select{
+    background:#0b1220; border:1px solid #1f2937; color:var(--text);
+    border-radius:10px; padding:10px; outline:none; transition:border-color .2s ease, box-shadow .2s ease;
+  }
+  textarea{min-height:80px; resize:vertical}
+  input:focus, textarea:focus, select:focus{border-color:#334155; box-shadow:0 0 0 4px #0ea5e940}
+  .inline{display:flex; gap:8px; align-items:center; flex-wrap:wrap}
+  .badge{padding:4px 8px; border-radius:8px; border:1px solid #1f2937; color:#93c5fd}
+  .divider{height:1px; background:#1f2937; margin:8px 0}
+  .stat-card{
+    padding:12px; border-radius:12px; border:1px solid #1f2937;
+    background:linear-gradient(180deg,#0b1220,#0f172a);
+  }
+  .stat-value{font-size:20px; font-weight:800}
+  .stat-label{font-size:12px; color:var(--muted)}
+  .table{width:100%; border-collapse:collapse; overflow:auto}
+  .table th, .table td{border-bottom:1px solid #1f2937; padding:10px; text-align:left}
+  .table th{color:#93c5fd; font-weight:700}
+  .table tr:hover td{background:#0f172a}
+  .watermark{
+    position:fixed; bottom:8px; right:12px; font-size:12px; color:#60a5fa; opacity:.85;
+    backdrop-filter:blur(2px); border:1px dashed #334155; border-radius:8px; padding:6px 8px;
+    pointer-events:none;
+  }
+  .footer{color:var(--muted); font-size:12px; padding:16px; text-align:center}
+  /* Responsive */
+  @media(max-width:1024px){
+    .app{grid-template-columns: 1fr; grid-template-rows:64px auto auto; grid-template-areas:
+      "topbar" "sidebar" "main"}
+    .sidebar{position:relative; top:auto; height:auto}
+  }
+  @media(max-width:720px){
+    .grid.cols-2, .grid.cols-3, .grid.cols-4{grid-template-columns:1fr}
+  }
+  /* Toasts */
+  .toast{
+    position:fixed; top:80px; right:16px; display:flex; flex-direction:column; gap:8px; z-index:60;
+  }
+  .toast-item{
+    background:#0f172a; border:1px solid #334155; color:#e5e7eb; padding:10px 12px; border-radius:12px;
+    box-shadow:0 8px 24px rgba(2,132,199,.2); animation:slide .25s ease;
+  }
+  @keyframes slide{from{opacity:0; transform:translateY(-6px)} to{opacity:1; transform:none}}
+  /* Mini tags */
+  .mini{font-size:11px; color:#94a3b8}
+  .kpi-up{color:var(--success)} .kpi-down{color:var(--danger)}
+</style>
+</head>
+<body>
+<div class="app">
+  <!-- Topbar -->
+  <div class="topbar">
+    <div class="brand">
+      <div class="brand-logo" aria-hidden="true"></div>
+      <div>
+        <div class="brand-title">LocalBoost</div>
+        <div class="byline">AI-assisted digital marketing for MSMEs — Developed by Shravan Agrawal</div>
+      </div>
+    </div>
+    <div class="top-actions">
+      <button class="btn" id="btnExport">Export dashboard</button>
+      <button class="btn" id="btnImport">Import</button>
+      <button class="btn success" id="btnSave">Save</button>
+      <button class="btn warn" id="btnReset">Reset</button>
+    </div>
+  </div>
+
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <div class="nav-group">
+      <div class="nav-title">Workspace</div>
+      <div class="nav-item active" data-section="overview">
+        <!-- Home icon -->
+        <svg viewBox="0 0 24 24" fill="none"><path d="M3 10.5L12 3l9 7.5v9a1.5 1.5 0 0 1-1.5 1.5H4.5A1.5 1.5 0 0 1 3 19.5v-9Z" stroke="#93c5fd" stroke-width="1.5"/><path d="M9 21v-6h6v6" stroke="#93c5fd" stroke-width="1.5"/></svg>
+        <span>Overview</span>
+      </div>
+      <div class="nav-item" data-section="planner">
+        <svg viewBox="0 0 24 24" fill="none"><rect x="3" y="4" width="18" height="16" rx="2" stroke="#93c5fd" stroke-width="1.5"/><path d="M3 9h18" stroke="#93c5fd" stroke-width="1.5"/></svg>
+        <span>Campaign planner</span>
+      </div>
+      <div class="nav-item" data-section="creative">
+        <svg viewBox="0 0 24 24" fill="none"><path d="M4 5h10l6 6v8a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V5Z" stroke="#93c5fd" stroke-width="1.5"/><path d="M10 5v6h6" stroke="#93c5fd" stroke-width="1.5"/></svg>
+        <span>Creative studio</span>
+      </div>
+      <div class="nav-item" data-section="scheduler">
+        <svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke="#93c5fd" stroke-width="1.5"/><path d="M12 7v6l4 2" stroke="#93c5fd" stroke-width="1.5"/></svg>
+        <span>Scheduler</span>
+      </div>
+      <div class="nav-item" data-section="execution">
+        <svg viewBox="0 0 24 24" fill="none"><path d="M4 12h16M12 4v16" stroke="#93c5fd" stroke-width="1.5"/></svg>
+        <span>Execution</span>
+      </div>
+      <div class="nav-item" data-section="analytics">
+        <svg viewBox="0 0 24 24" fill="none"><path d="M4 18v-6M10 18V6M16 18v-3M21 20H3" stroke="#93c5fd" stroke-width="1.5"/></svg>
+        <span>Analytics</span>
+      </div>
+      <div class="nav-item" data-section="library">
+        <svg viewBox="0 0 24 24" fill="none"><rect x="3" y="4" width="18" height="16" rx="2" stroke="#93c5fd" stroke-width="1.5"/><path d="M7 8v8M12 8v8M17 8v8" stroke="#93c5fd" stroke-width="1.5"/></svg>
+        <span>Assets library</span>
+      </div>
+      <div class="nav-item" data-section="settings">
+        <svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="3" stroke="#93c5fd" stroke-width="1.5"/><path d="M19.4 15a7.97 7.97 0 0 0 .1-6m-14.9 6a8 8 0 0 1 0-6" stroke="#93c5fd" stroke-width="1.5"/></svg>
+        <span>Settings</span>
+      </div>
+    </div>
+
+    <div class="nav-group">
+      <div class="nav-title">Shortcuts</div>
+      <div class="inline">
+        <span class="badge">AI Assist</span>
+        <span class="badge">PWA-ready</span>
+        <span class="badge">Offline-safe</span>
+        <span class="badge">Session persistent</span>
+      </div>
+    </div>
+  </aside>
+
+  <!-- Main -->
+  <main class="main">
+    <!-- Overview -->
+    <section id="overview" class="section active">
+      <div class="panel">
+        <div class="panel-header">
+          <div class="panel-title">Workspace overview</div>
+          <div class="inline">
+            <span class="chip">Developed by Shravan Agrawal</span>
+            <span class="chip">LocalBoost v1.0</span>
+          </div>
+        </div>
+        <div class="grid cols-3">
+          <div class="stat-card">
+            <div class="stat-value" id="statCampaigns">0</div>
+            <div class="stat-label">Active campaigns</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-value" id="statBudget">₹0</div>
+            <div class="stat-label">Total budget</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-value" id="statROAS">0.00x</div>
+            <div class="stat-label">ROAS (simulated)</div>
+          </div>
+        </div>
+        <div class="divider"></div>
+        <div class="inline">
+          <span class="mini">Tip: Create a campaign, use AI Assist to generate copy and creatives, schedule posts, then run a simulated execution to get analytics.</span>
+        </div>
+      </div>
+      <div class="panel">
+        <div class="panel-header">
+          <div class="panel-title">Recent activity</div>
+          <div class="inline">
+            <button class="btn" id="btnQuickCampaign">+ Quick campaign</button>
+          </div>
+        </div>
+        <table class="table" id="recentActivity">
+          <thead><tr><th>Time</th><th>Event</th><th>Details</th></tr></thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- Planner -->
+    <section id="planner" class="section">
+      <div class="panel">
+        <div class="panel-header">
+          <div class="panel-title">Campaign planner</div>
+          <div class="inline">
+            <button class="btn primary" id="btnAIStrategy">AI strategy</button>
+            <button class="btn" id="btnAddCampaign">+ Add campaign</button>
+          </div>
+        </div>
+        <div class="grid cols-2">
+          <div class="field">
+            <div class="label">Campaign name</div>
+            <input id="campaignName" type="text" placeholder="e.g., Winter Sale — Agrawal Footwear" />
+          </div>
+          <div class="field">
+            <div class="label">Objective</div>
+            <select id="campaignObjective">
+              <option value="Awareness">Awareness</option>
+              <option value="Traffic">Traffic</option>
+              <option value="Leads">Leads</option>
+              <option value="Sales">Sales</option>
+              <option value="Retention">Retention</option>
+            </select>
+          </div>
+          <div class="field">
+            <div class="label">Budget (₹)</div>
+            <input id="campaignBudget" type="number" min="0" step="100" placeholder="10000" />
+          </div>
+          <div class="field">
+            <div class="label">Duration</div>
+            <div class="inline">
+              <input id="startDate" type="date" />
+              <input id="endDate" type="date" />
+            </div>
+          </div>
+          <div class="field">
+            <div class="label">Channels</div>
+            <div class="inline">
+              <label><input type="checkbox" class="channel" value="Facebook"> Facebook</label>
+              <label><input type="checkbox" class="channel" value="Instagram"> Instagram</label>
+              <label><input type="checkbox" class="channel" value="YouTube"> YouTube</label>
+              <label><input type="checkbox" class="channel" value="Google Ads"> Google Ads</label>
+              <label><input type="checkbox" class="channel" value="WhatsApp"> WhatsApp</label>
+              <label><input type="checkbox" class="channel" value="Email"> Email</label>
+              <label><input type="checkbox" class="channel" value="SMS"> SMS</label>
+            </div>
+          </div>
+          <div class="field">
+            <div class="label">Target audience</div>
+            <textarea id="campaignAudience" placeholder="Demographics, interests, location (e.g., 18-35, fashion-conscious, Satna & nearby)"></textarea>
+          </div>
+          <div class="field">
+            <div class="label">Key message</div>
+            <textarea id="campaignMessage" placeholder="What should people remember? (e.g., Comfort-first design, winter-ready soles)"></textarea>
+          </div>
+          <div class="field">
+            <div class="label">KPIs</div>
+            <div class="inline">
+              <label><input type="checkbox" class="kpi" value="Reach"> Reach</label>
+              <label><input type="checkbox" class="kpi" value="CTR"> CTR</label>
+              <label><input type="checkbox" class="kpi" value="Leads"> Leads</label>
+              <label><input type="checkbox" class="kpi" value="Sales"> Sales</label>
+              <label><input type="checkbox" class="kpi" value="ROAS"> ROAS</label>
+            </div>
+          </div>
+        </div>
+        <div class="divider"></div>
+        <div class="inline">
+          <button class="btn success" id="btnSaveCampaign">Save campaign</button>
+          <button class="btn" id="btnClearCampaign">Clear</button>
+        </div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-header">
+          <div class="panel-title">Campaigns</div>
+          <div class="inline">
+            <input type="text" id="searchCampaigns" placeholder="Search campaigns..." />
+          </div>
+        </div>
+        <table class="table" id="campaignTable">
+          <thead><tr><th>Name</th><th>Objective</th><th>Budget</th><th>Duration</th><th>Channels</th><th>Status</th><th>Actions</th></tr></thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- Creative Studio -->
+    <section id="creative" class="section">
+      <div class="panel">
+        <div class="panel-header">
+          <div class="panel-title">AI creative studio</div>
+          <div class="inline">
+            <button class="btn primary" id="btnAICopy">AI copy</button>
+            <button class="btn" id="btnAICreative">AI creative ideas</button>
+          </div>
+        </div>
+        <div class="grid cols-2">
+          <div class="field">
+            <div class="label">Brand name</div>
+            <input id="brandName" type="text" placeholder="Agrawal Footwear" />
+          </div>
+          <div class="field">
+            <div class="label">Tone</div>
+            <select id="brandTone">
+              <option>Confident</option>
+              <option>Friendly</option>
+              <option>Premium</option>
+              <option>Minimal</option>
+              <option>Bold</option>
+            </select>
+          </div>
+          <div class="field">
+            <div class="label">Offer</div>
+            <input id="brandOffer" type="text" placeholder="Flat 20% off on winter collection" />
+          </div>
+          <div class="field">
+            <div class="label">CTA</div>
+            <input id="brandCTA" type="text" placeholder="Shop now" />
+          </div>
+        </div>
+        <div class="divider"></div>
+        <div class="grid cols-2">
+          <div class="field">
+            <div class="label">Generated copy</div>
+            <textarea id="generatedCopy" placeholder="AI will generate platform-ready copy here..."></textarea>
+            <div class="inline">
+              <button class="btn success" id="btnAddCopyAsset">Save to library</button>
+            </div>
+          </div>
+          <div class="field">
+            <div class="label">Creative ideas</div>
+            <textarea id="generatedCreative" placeholder="AI will propose visuals, hooks, carousels..."></textarea>
+            <div class="inline">
+              <button class="btn success" id="btnAddCreativeAsset">Save to library</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Scheduler -->
+    <section id="scheduler" class="section">
+      <div class="panel">
+        <div class="panel-header">
+          <div class="panel-title">Content scheduler</div>
+          <div class="inline">
+            <button class="btn" id="btnAddTask">+ Task</button>
+            <button class="btn primary" id="btnAICalendar">AI calendar</button>
+          </div>
+        </div>
+        <div class="grid cols-2">
+          <div class="field">
+            <div class="label">Task title</div>
+            <input id="taskTitle" type="text" placeholder="Instagram Reel — Winter boots" />
+          </div>
+          <div class="field">
+            <div class="label">Channel</div>
+            <select id="taskChannel">
+              <option>Instagram</option><option>Facebook</option><option>YouTube</option>
+              <option>Google Ads</option><option>WhatsApp</option><option>Email</option><option>SMS</option>
+            </select>
+          </div>
+          <div class="field">
+            <div class="label">Date & time</div>
+            <div class="inline">
+              <input id="taskDate" type="date" />
+              <input id="taskTime" type="time" />
+            </div>
+          </div>
+          <div class="field">
+            <div class="label">Linked campaign</div>
+            <select id="taskCampaignSelect"></select>
+          </div>
+          <div class="field">
+            <div class="label">Notes</div>
+            <textarea id="taskNotes" placeholder="Hashtags, copy variant, target audience, UTM..."></textarea>
+          </div>
+        </div>
+        <div class="divider"></div>
+        <div class="inline">
+          <button class="btn success" id="btnSaveTask">Save task</button>
+          <button class="btn" id="btnClearTask">Clear</button>
+        </div>
+      </div>
+      <div class="panel">
+        <div class="panel-header">
+          <div class="panel-title">Schedule</div>
+          <div class="inline">
+            <input id="searchTasks" type="text" placeholder="Search tasks..." />
+          </div>
+        </div>
+        <table class="table" id="taskTable">
+          <thead><tr><th>Title</th><th>Channel</th><th>Date</th><th>Time</th><th>Campaign</th><th>Status</th><th>Actions</th></tr></thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- Execution -->
+    <section id="execution" class="section">
+      <div class="panel">
+        <div class="panel-header">
+          <div class="panel-title">Execution simulator</div>
+          <div class="inline">
+            <button class="btn primary" id="btnRun">Run simulation</button>
+            <button class="btn" id="btnStop">Stop</button>
+          </div>
+        </div>
+        <div class="grid cols-3">
+          <div class="stat-card">
+            <div class="stat-value" id="execReach">0</div>
+            <div class="stat-label">Estimated reach</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-value" id="execClicks">0</div>
+            <div class="stat-label">Clicks</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-value" id="execConversions">0</div>
+            <div class="stat-label">Conversions</div>
+          </div>
+        </div>
+        <div class="divider"></div>
+        <div class="inline">
+          <span class="mini">Simulation uses your campaign budgets, channels, and tasks to estimate performance. It writes results to Analytics.</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- Analytics -->
+    <section id="analytics" class="section">
+      <div class="panel">
+        <div class="panel-header">
+          <div class="panel-title">Performance analytics</div>
+          <div class="inline">
+            <button class="btn" id="btnRefreshAnalytics">Refresh</button>
+            <button class="btn" id="btnExportCSV">Export CSV</button>
+          </div>
+        </div>
+        <div class="grid cols-2">
+          <div class="panel">
+            <div class="panel-header"><div class="panel-title">Overview KPIs</div></div>
+            <canvas id="chartKPI" height="160"></canvas>
+          </div>
+          <div class="panel">
+            <div class="panel-header"><div class="panel-title">Channel mix</div></div>
+            <canvas id="chartChannels" height="160"></canvas>
+          </div>
+        </div>
+        <div class="panel">
+          <div class="panel-header"><div class="panel-title">Event log</div></div>
+          <table class="table" id="analyticsTable">
+            <thead><tr><th>Time</th><th>Metric</th><th>Value</th><th>Source</th></tr></thead>
+            <tbody></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- Assets -->
+    <section id="library" class="section">
+      <div class="panel">
+        <div class="panel-header">
+          <div class="panel-title">Assets library</div>
+          <div class="inline">
+            <button class="btn" id="btnUploadAsset">Upload</button>
+            <input id="assetFile" type="file" style="display:none" />
+          </div>
+        </div>
+        <table class="table" id="assetTable">
+          <thead><tr><th>Name</th><th>Type</th><th>Size</th><th>Created</th><th>Actions</th></tr></thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- Settings -->
+    <section id="settings" class="section">
+      <div class="panel">
+        <div class="panel-header">
+          <div class="panel-title">Settings</div>
+          <div class="inline">
+            <span class="badge">Workspace</span>
+          </div>
+        </div>
+        <div class="grid cols-2">
+          <div class="field">
+            <div class="label">Workspace name</div>
+            <input id="wsName" type="text" placeholder="LocalBoost — Agrawal Footwear" />
+          </div>
+          <div class="field">
+            <div class="label">Owner byline</div>
+            <input id="wsByline" type="text" placeholder="Developed by Shravan Agrawal" />
+          </div>
+          <div class="field">
+            <div class="label">Currency</div>
+            <select id="wsCurrency"><option>₹</option><option>$</option><option>€</option></select>
+          </div>
+          <div class="field">
+            <div class="label">Auto-save</div>
+            <select id="wsAutosave"><option>On</option><option>Off</option></select>
+          </div>
+        </div>
+        <div class="divider"></div>
+        <div class="inline">
+          <button class="btn success" id="btnSaveSettings">Save settings</button>
+        </div>
+      </div>
+      <div class="footer">LocalBoost — AI-assisted digital marketing platform. Watermark active: Developed by Shravan Agrawal.</div>
+    </section>
+  </main>
+</div>
+
+<!-- Watermark -->
+<div class="watermark">Developed by Shravan Agrawal • LocalBoost</div>
+
+<!-- Toasts -->
+<div class="toast" id="toast"></div>
+
+<script>
+/* ==========
+  LocalBoost v1.0 — Single-file app
+  Author: Shravan Agrawal
+  Notes: No external deps. All data stored in localStorage. Charts rendered via lightweight canvas code.
+========== */
+
+// ---------- Utilities ----------
+const $ = sel => document.querySelector(sel);
+const $$ = sel => Array.from(document.querySelectorAll(sel));
+const fmt = n => new Intl.NumberFormat('en-IN').format(Math.round(n));
+const nowISO = () => new Date().toISOString();
+const currency = () => (JSON.parse(localStorage.getItem('lb_settings'))||{currency:'₹'}).currency || '₹';
+
+function toast(msg){
+  const box = $('#toast');
+  const el = document.createElement('div');
+  el.className = 'toast-item';
+  el.textContent = msg;
+  box.appendChild(el);
+  setTimeout(()=>{ el.style.opacity=0; el.style.transform='translateY(-4px)'; el.remove(); }, 3000);
+}
+
+function save(key, value){
+  localStorage.setItem(key, JSON.stringify(value));
+  const settings = JSON.parse(localStorage.getItem('lb_settings'))||{};
+  if((settings.autosave||'On')==='On') toast('Saved');
+}
+
+function load(key, fallback){ 
+  try{ return JSON.parse(localStorage.getItem(key)) ?? fallback; }catch(e){ return fallback; }
+}
+
+function addActivity(event, details){
+  const log = load('lb_activity', []);
+  log.unshift({time: new Date().toLocaleString(), event, details});
+  save('lb_activity', log);
+  renderActivity();
+}
+
+// ---------- Navigation ----------
+$$('.nav-item').forEach(item=>{
+  item.addEventListener('click', ()=> {
+    $$('.nav-item').forEach(i=>i.classList.remove('active'));
+    item.classList.add('active');
+    const sec = item.dataset.section;
+    $$('.section').forEach(s=>s.classList.remove('active'));
+    $('#'+sec).classList.add('active');
+  });
+});
+
+// ---------- Overview ----------
+function renderActivity(){
+  const log = load('lb_activity', []);
+  const tbody = $('#recentActivity tbody');
+  tbody.innerHTML = log.slice(0,20).map(x=>`<tr><td>${x.time}</td><td>${x.event}</td><td>${x.details}</td></tr>`).join('');
+}
+function renderOverviewStats(){
+  const campaigns = load('lb_campaigns', []);
+  const totalBudget = campaigns.reduce((s,c)=> s + (Number(c.budget)||0), 0);
+  const roas = calcROAS();
+  $('#statCampaigns').textContent = fmt(campaigns.filter(c=>c.status!=='Archived').length);
+  $('#statBudget').textContent = currency()+fmt(totalBudget);
+  $('#statROAS').textContent = roas.toFixed(2)+'x';
+}
+function calcROAS(){
+  const analytics = load('lb_analytics', []);
+  const spend = analytics.filter(a=>a.metric==='Spend').reduce((s,a)=>s+a.value,0);
+  const rev   = analytics.filter(a=>a.metric==='Revenue').reduce((s,a)=>s+a.value,0);
+  return spend ? (rev/spend) : 0;
+}
+$('#btnQuickCampaign').addEventListener('click', ()=>{
+  const c = {
+    id: crypto.randomUUID(),
+    name:'Quick — Winter Boost',
+    objective:'Sales',
+    budget:10000,
+    startDate: new Date().toISOString().slice(0,10),
+    endDate: new Date(Date.now()+7*864e5).toISOString().slice(0,10),
+    channels:['Instagram','WhatsApp','Google Ads'],
+    audience:'18-35, Satna; comfort-first winter wear',
+    message:'Warmth + grip + style — winter-ready footwear.',
+    kpis:['Sales','ROAS','CTR'],
+    status:'Planned'
+  };
+  const arr = load('lb_campaigns', []);
+  arr.unshift(c);
+  save('lb_campaigns', arr);
+  addActivity('Campaign created', c.name);
+  renderCampaigns();
+  syncCampaignSelect();
+  renderOverviewStats();
+});
+
+// ---------- Planner ----------
+function validateCampaign(){
+  const name = $('#campaignName').value.trim();
+  const budget = Number($('#campaignBudget').value);
+  const start = $('#startDate').value;
+  const end = $('#endDate').value;
+  if(!name) return 'Name is required.';
+  if(!budget || budget<=0) return 'Budget must be a positive number.';
+  if(!start || !end) return 'Start and end dates are required.';
+  if(new Date(end) < new Date(start)) return 'End date must be after start date.';
+  return null;
+}
+function getCampaignInputs(){
+  return {
+    id: crypto.randomUUID(),
+    name: $('#campaignName').value.trim(),
+    objective: $('#campaignObjective').value,
+    budget: Number($('#campaignBudget').value),
+    startDate: $('#startDate').value,
+    endDate: $('#endDate').value,
+    channels: $$('.channel:checked').map(c=>c.value),
+    audience: $('#campaignAudience').value.trim(),
+    message: $('#campaignMessage').value.trim(),
+    kpis: $$('.kpi:checked').map(k=>k.value),
+    status:'Planned'
+  };
+}
+$('#btnAddCampaign').addEventListener('click', ()=>{
+  $('#campaignName').value='';
+  $('#campaignBudget').value='';
+  $('#startDate').value='';
+  $('#endDate').value='';
+  $$('.channel').forEach(c=>c.checked=false);
+  $('#campaignAudience').value='';
+  $('#campaignMessage').value='';
+  $$('.kpi').forEach(k=>k.checked=false);
+});
+$('#btnAIStrategy').addEventListener('click', ()=>{
+  const objective = $('#campaignObjective').value;
+  const advice = aiStrategy(objective);
+  $('#campaignMessage').value = advice.message;
+  $('#campaignAudience').value = advice.audience;
+  toast('AI strategy suggested');
+});
+$('#btnSaveCampaign').addEventListener('click', ()=>{
+  const err = validateCampaign();
+  if(err){ toast(err); return; }
+  const c = getCampaignInputs();
+  const arr = load('lb_campaigns', []);
+  arr.unshift(c);
+  save('lb_campaigns', arr);
+  addActivity('Campaign saved', c.name);
+  renderCampaigns();
+  syncCampaignSelect();
+  renderOverviewStats();
+});
+$('#btnClearCampaign').addEventListener('click', ()=>{
+  $('#campaignName').value='';
+  $('#campaignBudget').value='';
+  $('#campaignAudience').value='';
+  $('#campaignMessage').value='';
+  toast('Cleared');
+});
+$('#searchCampaigns').addEventListener('input', renderCampaigns);
+
+function renderCampaigns(){
+  const q = $('#searchCampaigns').value?.toLowerCase() || '';
+  const arr = load('lb_campaigns', []);
+  const tbody = $('#campaignTable tbody');
+  tbody.innerHTML = arr
+    .filter(c=> c.name.toLowerCase().includes(q) || c.objective.toLowerCase().includes(q))
+    .map(c=>{
+      const dur = `${c.startDate} → ${c.endDate}`;
+      const ch = c.channels.join(', ');
+      return `<tr>
+        <td>${c.name}</td>
+        <td>${c.objective}</td>
+        <td>${currency()}${fmt(c.budget)}</td>
+        <td>${dur}</td>
+        <td>${ch}</td>
+        <td><span class="badge">${c.status}</span></td>
+        <td>
+          <button class="btn mini" data-act="edit" data-id="${c.id}">Edit</button>
+          <button class="btn mini" data-act="archive" data-id="${c.id}">Archive</button>
+          <button class="btn mini" data-act="delete" data-id="${c.id}">Delete</button>
+        </td>
+      </tr>`;
+    }).join('');
+  // action handlers
+  $$('#campaignTable [data-act]').forEach(b=>{
+    b.onclick = ()=>{
+      const id = b.dataset.id;
+      const act = b.dataset.act;
+      const arr = load('lb_campaigns', []);
+      const idx = arr.findIndex(x=>x.id===id);
+      if(idx<0) return;
+      if(act==='delete'){ arr.splice(idx,1); save('lb_campaigns',arr); toast('Deleted'); renderCampaigns(); renderOverviewStats(); syncCampaignSelect(); return; }
+      if(act==='archive'){ arr[idx].status='Archived'; save('lb_campaigns',arr); toast('Archived'); renderCampaigns(); renderOverviewStats(); return; }
+      if(act==='edit'){ const c=arr[idx]; $('#campaignName').value=c.name; $('#campaignBudget').value=c.budget; $('#startDate').value=c.startDate; $('#endDate').value=c.endDate; 
+        $$('.channel').forEach(ch=> ch.checked = c.channels.includes(ch.value));
+        $('#campaignAudience').value=c.audience; $('#campaignMessage').value=c.message;
+        $$('.kpi').forEach(k=> k.checked = c.kpis.includes(k.value));
+        toast('Loaded into form');
+      }
+    };
+  });
+}
+function syncCampaignSelect(){
+  const arr = load('lb_campaigns', []);
+  const sel = $('#taskCampaignSelect');
+  sel.innerHTML = arr.map(c=> `<option value="${c.id}">${c.name}</option>`).join('');
+}
+
+// ---------- AI Helpers ----------
+function aiStrategy(objective){
+  const baseAudience = '18-45, tier-2 city shoppers, price-sensitive yet quality-conscious.';
+  const strategies = {
+    Awareness: {
+      message: 'Hook with brand story + trust signals. 3-post series: origin, craftsmanship, customer love.',
+      audience: baseAudience
+    },
+    Traffic: {
+      message: 'Clear benefit + urgency. Carousel: pain points → solution → proof → CTA.',
+      audience: baseAudience+' Add interest: fashion & comfort.'
+    },
+    Leads: {
+      message: 'Lead magnet: “Winter fit guide” + WhatsApp opt-in + coupon follow-up.',
+      audience: baseAudience+' Add behavior: recent footwear shoppers.'
+    },
+    Sales: {
+      message: 'Offer-led + social proof. Retarget with dynamic creatives. CTA: Shop now.',
+      audience: baseAudience+' Add intent: in-market for shoes.'
+    },
+    Retention: {
+      message: 'Loyalty drip: care tips + referral bonus + early access drops.',
+      audience: baseAudience+' Existing customers, high LTV.'
+    }
+  };
+  return strategies[objective] || strategies.Awareness;
+}
+
+function aiCopy({brand, tone, offer, cta}){
+  const emoji = tone==='Friendly' ? '✨' : tone==='Bold' ? '⚡' : tone==='Premium' ? '💎' : '';
+  return [
+    `${emoji} ${brand}: Winter-ready comfort meets style.`,
+    `Limited-time: ${offer}.`,
+    `Crafted for grip, warmth, and long walks.`,
+    `Trusted by Satna shoppers. ${cta} →`,
+    `Developed by Shravan Agrawal • LocalBoost`
+  ].join('\n');
+}
+
+function aiCreativeIdeas({brand, tone}){
+  const motif = tone==='Minimal' ? 'clean grid, soft light' :
+                tone==='Premium' ? 'dark backgrounds, macro textures' :
+                tone==='Bold' ? 'high contrast, oversized type' : 'bright, friendly colorways';
+  return [
+    `Visual motif: ${motif}.`,
+    `Carousel: Problem → Solution → Proof → Offer → CTA.`,
+    `UGC Reel: “First snow walk test” with grip shots.`,
+    `WhatsApp story pack: 3 frames (Offer • Benefit • CTA).`,
+    `Watermark: Developed by Shravan Agrawal • LocalBoost`
+  ].join('\n');
+}
+
+// ---------- Creative Studio ----------
+$('#btnAICopy').addEventListener('click', ()=>{
+  const payload = {
+    brand: $('#brandName').value || 'Your Brand',
+    tone: $('#brandTone').value,
+    offer: $('#brandOffer').value || 'Special offer',
+    cta: $('#brandCTA').value || 'Shop now'
+  };
+  $('#generatedCopy').value = aiCopy(payload);
+  addActivity('AI copy generated', payload.brand);
+});
+$('#btnAICreative').addEventListener('click', ()=>{
+  const payload = {
+    brand: $('#brandName').value || 'Your Brand',
+    tone: $('#brandTone').value
+  };
+  $('#generatedCreative').value = aiCreativeIdeas(payload);
+  addActivity('AI creative ideas', payload.brand);
+});
+$('#btnAddCopyAsset').addEventListener('click', ()=>{
+  const text = $('#generatedCopy').value.trim();
+  if(!text){ toast('Generate copy first'); return; }
+  addAsset({name:`Copy — ${new Date().toLocaleString()}`, type:'text', size:text.length, content:text});
+  toast('Copy saved to library');
+});
+$('#btnAddCreativeAsset').addEventListener('click', ()=>{
+  const text = $('#generatedCreative').value.trim();
+  if(!text){ toast('Generate ideas first'); return; }
+  addAsset({name:`Creative ideas — ${new Date().toLocaleString()}`, type:'text', size:text.length, content:text});
+  toast('Ideas saved to library');
+});
+
+// ---------- Scheduler ----------
+function validateTask(){
+  if(!$('#taskTitle').value.trim()) return 'Title is required.';
+  if(!$('#taskDate').value) return 'Date is required.';
+  if(!$('#taskTime').value) return 'Time is required.';
+  return null;
+}
+$('#btnAddTask').addEventListener('click', ()=>{
+  $('#taskTitle').value=''; $('#taskChannel').value='Instagram'; $('#taskDate').value=''; $('#taskTime').value='';
+  $('#taskNotes').value='';
+  toast('New task');
+});
+$('#btnAICalendar').addEventListener('click', ()=>{
+  const arr = load('lb_campaigns', []);
+  if(arr.length===0){ toast('Create a campaign first'); return; }
+  const c = arr[0];
+  const start = new Date(c.startDate);
+  const plan = [
+    {d:0, ch:'Instagram', t:'10:00', title:`Reel — ${c.name}`},
+    {d:2, ch:'WhatsApp', t:'12:00', title:`Broadcast — Offer`},
+    {d:4, ch:'Facebook', t:'18:00', title:`Carousel — Proof points`},
+    {d:6, ch:'Google Ads', t:'09:00', title:`Search — Brand keywords`}
+  ];
+  const tasks = load('lb_tasks', []);
+  plan.forEach(p=>{
+    const dt = new Date(+start + p.d*864e5);
+    tasks.unshift({
+      id: crypto.randomUUID(),
+      title:p.title,
+      channel:p.ch,
+      date: dt.toISOString().slice(0,10),
+      time: p.t,
+      campaignId: c.id,
+      notes:'Auto-generated by AI calendar',
+      status:'Scheduled'
+    });
+  });
+  save('lb_tasks', tasks);
+  addActivity('AI calendar generated', c.name);
+  renderTasks();
+});
+$('#btnSaveTask').addEventListener('click', ()=>{
+  const err = validateTask(); if(err){ toast(err); return; }
+  const t = {
+    id: crypto.randomUUID(),
+    title: $('#taskTitle').value.trim(),
+    channel: $('#taskChannel').value,
+    date: $('#taskDate').value,
+    time: $('#taskTime').value,
+    campaignId: $('#taskCampaignSelect').value,
+    notes: $('#taskNotes').value.trim(),
+    status:'Scheduled'
+  };
+  const arr = load('lb_tasks', []);
+  arr.unshift(t);
+  save('lb_tasks', arr);
+  addActivity('Task saved', t.title);
+  renderTasks();
+});
+$('#btnClearTask').addEventListener('click', ()=>{ $('#taskTitle').value=''; $('#taskNotes').value=''; toast('Cleared'); });
+$('#searchTasks').addEventListener('input', renderTasks);
+
+function renderTasks(){
+  const q = $('#searchTasks').value?.toLowerCase() || '';
+  const tasks = load('lb_tasks', []);
+  const campaigns = load('lb_campaigns', []);
+  const tbody = $('#taskTable tbody');
+  tbody.innerHTML = tasks
+    .filter(t=> t.title.toLowerCase().includes(q) || t.channel.toLowerCase().includes(q))
+    .map(t=>{
+      const c = campaigns.find(x=>x.id===t.campaignId);
+      return `<tr>
+        <td>${t.title}</td>
+        <td>${t.channel}</td>
+        <td>${t.date}</td>
+        <td>${t.time}</td>
+        <td>${c ? c.name : '-'}</td>
+        <td><span class="badge">${t.status}</span></td>
+        <td>
+          <button class="btn mini" data-act="done" data-id="${t.id}">Mark done</button>
+          <button class="btn mini" data-act="delete" data-id="${t.id}">Delete</button>
+        </td>
+      </tr>`;
+    }).join('');
+  $$('#taskTable [data-act]').forEach(b=>{
+    b.onclick = ()=>{
+      const id=b.dataset.id, act=b.dataset.act;
+      const arr = load('lb_tasks', []);
+      const idx = arr.findIndex(x=>x.id===id);
+      if(idx<0) return;
+      if(act==='delete'){ arr.splice(idx,1); save('lb_tasks',arr); toast('Deleted'); renderTasks(); return; }
+      if(act==='done'){ arr[idx].status='Posted'; save('lb_tasks',arr); toast('Marked as posted'); renderTasks(); }
+    };
+  });
+}
+
+// ---------- Execution Simulator ----------
+let runTimer = null;
+$('#btnRun').addEventListener('click', ()=>{
+  if(runTimer){ toast('Simulation already running'); return; }
+  const tasks = load('lb_tasks', []);
+  const campaigns = load('lb_campaigns', []);
+  if(campaigns.length===0){ toast('No campaigns'); return; }
+  let reach=0, clicks=0, conv=0, spend=0, revenue=0;
+  runTimer = setInterval(()=>{
+    // per tick simulate based on budgets and tasks
+    const tickTasks = tasks.slice(0,3);
+    tickTasks.forEach(t=>{
+      const c = campaigns.find(x=>x.id===t.campaignId) || {budget:1000, channels:[t.channel]};
+      const chFactor = {
+        Instagram:1.2, Facebook:1.0, YouTube:1.1, 'Google Ads':1.4, WhatsApp:0.8, Email:0.6, SMS:0.5
+      }[t.channel] || 1;
+      const budgetSlice = Math.min(c.budget/10, 2000);
+      const r = Math.round(budgetSlice * 30 * chFactor);
+      const k = Math.round(r * (0.02 + 0.03*Math.random()));
+      const v = Math.round(k * (0.03 + 0.05*Math.random()));
+      const spendTick = Math.round(budgetSlice * (0.3 + 0.2*Math.random()));
+      const revenueTick = Math.round(v * (600 + 1200*Math.random()));
+      reach += r; clicks += k; conv += v; spend += spendTick; revenue += revenueTick;
+
+      pushAnalytics('Reach', r, t.channel);
+      pushAnalytics('Clicks', k, t.channel);
+      pushAnalytics('Conversions', v, t.channel);
+      pushAnalytics('Spend', spendTick, t.channel);
+      pushAnalytics('Revenue', revenueTick, t.channel);
+    });
+    $('#execReach').textContent = fmt(reach);
+    $('#execClicks').textContent = fmt(clicks);
+    $('#execConversions').textContent = fmt(conv);
+    renderOverviewStats();
+    renderAnalytics();
+  }, 1200);
+  addActivity('Simulation started', 'Writing metrics to analytics');
+  toast('Simulation running');
+});
+$('#btnStop').addEventListener('click', ()=>{
+  if(runTimer) { clearInterval(runTimer); runTimer=null; toast('Simulation stopped'); addActivity('Simulation stopped','—'); }
+});
+
+// ---------- Analytics ----------
+function pushAnalytics(metric, value, source){
+  const arr = load('lb_analytics', []);
+  arr.unshift({time:new Date().toLocaleString(), metric, value, source});
+  save('lb_analytics', arr);
+}
+$('#btnRefreshAnalytics').addEventListener('click', renderAnalytics);
+$('#btnExportCSV').addEventListener('click', exportAnalyticsCSV);
+
+function renderAnalytics(){
+  const arr = load('lb_analytics', []);
+  const tbody = $('#analyticsTable tbody');
+  tbody.innerHTML = arr.slice(0,200).map(a=> `<tr><td>${a.time}</td><td>${a.metric}</td><td>${fmt(a.value)}</td><td>${a.source}</td></tr>`).join('');
+  drawKPIChart(arr);
+  drawChannelChart(arr);
+}
+function exportAnalyticsCSV(){
+  const arr = load('lb_analytics', []);
+  const rows = [['Time','Metric','Value','Source']].concat(arr.map(a=>[a.time,a.metric,a.value,a.source]));
+  const csv = rows.map(r=>r.map(x=>JSON.stringify(x)).join(',')).join('\n');
+  const blob = new Blob([csv], {type:'text/csv'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href=url; a.download='LocalBoost_Analytics.csv'; a.click();
+  setTimeout(()=>URL.revokeObjectURL(url), 1000);
+  addActivity('Exported CSV','Analytics');
+  toast('Analytics exported');
+}
+
+// Minimal charting via canvas
+function drawKPIChart(arr){
+  const canvas = $('#chartKPI'); const ctx = canvas.getContext('2d');
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+  canvas.width = canvas.clientWidth; canvas.height = canvas.clientHeight;
+  const metrics = {Reach:0, Clicks:0, Conversions:0, Revenue:0, Spend:0};
+  arr.forEach(a=>{ if(metrics[a.metric]!==undefined) metrics[a.metric]+=a.value; });
+  const keys = Object.keys(metrics);
+  const values = keys.map(k=>metrics[k]);
+  const max = Math.max(...values, 1);
+  const barW = (canvas.width - 40)/keys.length;
+  keys.forEach((k,i)=>{
+    const h = (values[i]/max) * (canvas.height - 40);
+    ctx.fillStyle = ['#22d3ee','#0ea5e9','#a78bfa','#10b981','#f59e0b'][i%5];
+    ctx.fillRect(20 + i*barW, canvas.height - 20 - h, barW - 10, h);
+    ctx.fillStyle = '#94a3b8'; ctx.font = '12px sans-serif';
+    ctx.fillText(k, 20 + i*barW, canvas.height - 6);
+  });
+}
+
+function drawChannelChart(arr){
+  const canvas = $('#chartChannels'); const ctx = canvas.getContext('2d');
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+  canvas.width = canvas.clientWidth; canvas.height = canvas.clientHeight;
+  const map = {};
+  arr.forEach(a=>{ const s=a.source||'Unknown'; map[s]=(map[s]||0)+a.value; });
+  const entries = Object.entries(map).slice(0,8);
+  const total = entries.reduce((s,[,v])=>s+v,0) || 1;
+  let start=0; const cx=canvas.width/2, cy=canvas.height/2, r=Math.min(cx,cy)-10;
+  entries.forEach(([label,val],i)=>{
+    const frac = val/total; const end = start + frac*Math.PI*2;
+    ctx.beginPath(); ctx.moveTo(cx,cy); ctx.arc(cx,cy,r,start,end); ctx.closePath();
+    ctx.fillStyle = ['#0ea5e9','#22d3ee','#a78bfa','#10b981','#f59e0b','#ef4444','#14b8a6','#f472b6'][i%8];
+    ctx.fill();
+    start=end;
+  });
+  // labels
+  ctx.fillStyle='#94a3b8'; ctx.font='12px sans-serif';
+  let y=14;
+  entries.forEach(([label,val],i)=>{
+    ctx.fillStyle = ['#0ea5e9','#22d3ee','#a78bfa','#10b981','#f59e0b','#ef4444','#14b8a6','#f472b6'][i%8];
+    ctx.fillRect(10,y-10,10,10);
+    ctx.fillStyle='#94a3b8';
+    ctx.fillText(`${label}`, 26, y);
+    y+=16;
+  });
+}
+
+// ---------- Assets ----------
+function addAsset(asset){
+  const arr = load('lb_assets', []);
+  arr.unshift({id:crypto.randomUUID(), created:new Date().toLocaleString(), ...asset});
+  save('lb_assets', arr);
+  renderAssets();
+}
+$('#btnUploadAsset').addEventListener('click', ()=> $('#assetFile').click());
+$('#assetFile').addEventListener('change', (e)=>{
+  const file = e.target.files[0];
+  if(!file) return;
+  const reader = new FileReader();
+  reader.onload = ()=>{
+    addAsset({name:file.name, type:file.type||'file', size:file.size, content:reader.result});
+    addActivity('Asset uploaded', file.name);
+    toast('Uploaded to library');
+  };
+  reader.readAsDataURL(file);
+});
+function renderAssets(){
+  const arr = load('lb_assets', []);
+  const tbody = $('#assetTable tbody');
+  tbody.innerHTML = arr.map(a=>`<tr>
+    <td>${a.name}</td><td>${a.type}</td><td>${fmt(a.size)} B</td><td>${a.created}</td>
+    <td>
+      <button class="btn mini" data-act="download" data-id="${a.id}">Download</button>
+      <button class="btn mini" data-act="delete" data-id="${a.id}">Delete</button>
+    </td>
+  </tr>`).join('');
+  $$('#assetTable [data-act]').forEach(b=>{
+    b.onclick = ()=>{
+      const id=b.dataset.id, act=b.dataset.act;
+      const arr = load('lb_assets', []);
+      const a = arr.find(x=>x.id===id);
+      if(!a) return;
+      if(act==='delete'){ save('lb_assets', arr.filter(x=>x.id!==id)); toast('Deleted'); renderAssets(); return; }
+      if(act==='download'){
+        const blob = new Blob([a.content||''], {type: a.type||'text/plain'});
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href=url; link.download=a.name; link.click();
+        setTimeout(()=>URL.revokeObjectURL(url), 800);
+      }
+    };
+  });
+}
+
+// ---------- Settings ----------
+$('#btnSaveSettings').addEventListener('click', ()=>{
+  const settings = {
+    name: $('#wsName').value || 'LocalBoost',
+    byline: $('#wsByline').value || 'Developed by Shravan Agrawal',
+    currency: $('#wsCurrency').value || '₹',
+    autosave: $('#wsAutosave').value || 'On'
+  };
+  save('lb_settings', settings);
+  document.querySelector('.brand-title').textContent = settings.name;
+  document.querySelector('.byline').textContent = 'AI-assisted digital marketing for MSMEs — ' + settings.byline;
+  addActivity('Settings saved', settings.name);
+  renderOverviewStats();
+});
+
+// Topbar buttons (Export/Import/Save/Reset)
+$('#btnSave').addEventListener('click', ()=>{
+  toast('Workspace saved');
+});
+$('#btnReset').addEventListener('click', ()=>{
+  if(!confirm('Reset all LocalBoost data?')) return;
+  ['lb_campaigns','lb_tasks','lb_assets','lb_analytics','lb_activity'].forEach(k=>localStorage.removeItem(k));
+  toast('Workspace reset');
+  renderAll();
+});
+$('#btnExport').addEventListener('click', ()=>{
+  const payload = {
+    campaigns: load('lb_campaigns', []),
+    tasks: load('lb_tasks', []),
+    assets: load('lb_assets', []),
+    analytics: load('lb_analytics', []),
+    activity: load('lb_activity', []),
+    settings: load('lb_settings', {name:'LocalBoost', byline:'Developed by Shravan Agrawal', currency:'₹', autosave:'On'})
+  };
+  const blob = new Blob([JSON.stringify(payload,null,2)], {type:'application/json'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href=url; a.download='LocalBoost_Workspace.json'; a.click();
+  setTimeout(()=>URL.revokeObjectURL(url), 1000);
+  toast('Exported workspace');
+});
+$('#btnImport').addEventListener('click', ()=>{
+  const input = document.createElement('input');
+  input.type='file'; input.accept='.json,application/json';
+  input.onchange = (e)=>{
+    const file = e.target.files[0]; if(!file) return;
+    const reader = new FileReader();
+    reader.onload = ()=>{
+      try{
+        const data = JSON.parse(reader.result);
+        save('lb_campaigns', data.campaigns||[]);
+        save('lb_tasks', data.tasks||[]);
+        save('lb_assets', data.assets||[]);
+        save('lb_analytics', data.analytics||[]);
+        save('lb_activity', data.activity||[]);
+        save('lb_settings', data.settings||{});
+        toast('Imported workspace');
+        renderAll();
+      }catch(err){ toast('Invalid JSON'); }
+    };
+    reader.readAsText(file);
+  };
+  input.click();
+});
+
+// ---------- Initial render ----------
+function renderAll(){
+  renderActivity();
+  renderOverviewStats();
+  renderCampaigns();
+  syncCampaignSelect();
+  renderTasks();
+  renderAssets();
+  renderAnalytics();
+  // Load settings into inputs
+  const s = load('lb_settings', {name:'LocalBoost', byline:'Developed by Shravan Agrawal', currency:'₹', autosave:'On'});
+  $('#wsName').value = s.name; $('#wsByline').value = s.byline; $('#wsCurrency').value = s.currency; $('#wsAutosave').value = s.autosave;
+  document.querySelector('.brand-title').textContent = s.name;
+  document.querySelector('.byline').textContent = 'AI-assisted digital marketing for MSMEs — ' + s.byline;
+}
+renderAll();
+</script>
+</body>
+</html>
